@@ -5,7 +5,7 @@ from apriori_model import generate_rules
 st.title("🌍 Travel Package Recommendation System")
 st.markdown("Using Association Rule Mining to suggest bundled services")
 
-df = pd.read_csv('C:/Users/shrip/OneDrive/Desktop/travel-packages-master/data/travel_dataset.csv')
+df = pd.read_csv('data/travel_dataset.csv')
 
 rules = generate_rules()
 
