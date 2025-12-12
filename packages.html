@@ -1,81 +1,104 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Travel Packages</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5f7fa;
-            padding: 20px;
-        }
-        h1 {
-            text-align: center;
-            color: #34495e;
-        }
+<style>
+    /* Global Reset and Typography */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #ecf0f1; /* Light gray background */
+        padding: 40px 20px;
+        margin: 0;
+        line-height: 1.6;
+    }
+    h1 {
+        text-align: center;
+        color: #2c3e50; /* Darker heading color */
+        font-size: 2.5em;
+        margin-bottom: 40px;
+        position: relative;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+    /* Simple separator line under the main heading */
+    h1::after {
+        content: '';
+        display: block;
+        width: 80px;
+        height: 4px;
+        background: #3498db; /* Blue accent color */
+        margin: 10px auto 0;
+        border-radius: 2px;
+    }
+
+    /* Package Grid Layout */
+    .packages {
+        display: flex; /* Using Flexbox for flexible layout */
+        flex-wrap: wrap; /* Allows cards to wrap on smaller screens */
+        justify-content: center; /* Center the cards */
+        gap: 25px; /* Spacing between cards */
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* Card Styling */
+    .card {
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 15px; /* Softer rounded corners */
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Deeper, more subtle shadow */
+        text-align: center;
+        flex: 1 1 300px; /* Allows card to grow and shrink, with a base width of 300px */
+        max-width: 350px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effects */
+        border-top: 5px solid transparent; /* Prepare for border color on hover */
+        position: relative;
+        overflow: hidden; /* For pseudo-element effects */
+    }
+
+    /* Card Hover Effect */
+    .card:hover {
+        transform: translateY(-10px); /* Lift the card */
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15); /* Stronger shadow on hover */
+        border-top-color: #2ecc71; /* Green accent on top */
+    }
+    
+    /* Card Heading */
+    .card h2 {
+        color: #34495e; /* Dark, professional color */
+        margin-top: 5px;
+        font-size: 1.5em;
+        font-weight: 600;
+        text-transform: capitalize;
+    }
+
+    /* Icons */
+    .icon {
+        font-size: 48px; /* Larger icon size */
+        margin-bottom: 15px;
+        /* Using a nice gradient for icons */
+        background: linear-gradient(45deg, #3498db, #2ecc71);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: block; /* Ensures gradient works well */
+    }
+
+    /* Paragraph Text */
+    .card p {
+        color: #7f8c8d; /* Subtle text color */
+        font-size: 0.95em;
+        margin-top: 15px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 900px) {
         .packages {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-top: 30px;
+            grid-template-columns: repeat(2, 1fr); /* 2 columns on medium screens */
+        }
+    }
+    @media (max-width: 600px) {
+        .packages {
+            grid-template-columns: 1fr; /* 1 column on small screens */
+            padding: 0 10px;
         }
         .card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
-            text-align: center;
+            max-width: 100%;
         }
-        .card h2 {
-            color: #2980b9;
-            margin-bottom: 10px;
-        }
-        .icon {
-            font-size: 40px;
-            margin-bottom: 10px;
-        }
-        p {
-            color: #555;
-        }
-    </style>
-</head>
-<body>
-
-<h1>✨ Available Travel Packages</h1>
-
-<div class="packages">
-
-    <div class="card">
-        <div class="icon">✈️</div>
-        <h2>Flight</h2>
-        <p>Book domestic & international flights at best rates.</p>
-    </div>
-
-    <div class="card">
-        <div class="icon">🏨</div>
-        <h2>Hotel</h2>
-        <p>Stay at premium hotels with exclusive deals.</p>
-    </div>
-
-    <div class="card">
-        <div class="icon">🚌</div>
-        <h2>Local Tour</h2>
-        <p>Explore local attractions with guided tours.</p>
-    </div>
-
-    <div class="card">
-        <div class="icon">🚗</div>
-        <h2>Car Rental</h2>
-        <p>Flexible car rentals for city and outstation trips.</p>
-    </div>
-
-    <div class="card">
-        <div class="icon">🛡</div>
-        <h2>Insurance</h2>
-        <p>Travel worry-free with full protection plans.</p>
-    </div>
-
-</div>
-
-</body>
-</html>
+    }
+</style>
