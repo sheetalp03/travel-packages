@@ -1,80 +1,144 @@
-# app.py
+# app.py (Pure Streamlit Application)
 
-# Import necessary Flask modules
-from flask import Flask, render_template
+import streamlit as st
+import pandas as pd
+from apriori_model import generate_packages # Import your package generation function
 
-# Import the logic function from your Apriori model file
-# Make sure 'apriori_model.py' is in the same directory!
-# We will assume your Apriori model returns a DataFrame of rules or a similar iterable structure.
-from apriori_model import generate_packages 
+# --- Dummy Rules Data (For testing before connecting to your live model output) ---
+# Replace this with the code that loads your actual Apriori rules DataFrame
+DUMMY_RULES_DATA = pd.DataFrame([
+    {'antecedents': frozenset({'Flight'}), 'consequents': frozenset({'Hotel'}), 'support': 0.8},
+    {'antecedents': frozenset({'Hotel'}), 'consequents': frozenset({'Local_Tour'}), 'support': 0.7},
+    {'antecedents': frozenset({'Flight'}), 'consequents': frozenset({'Car_Rental'}), 'support': 0.6},
+    {'antecedents': frozenset({'Local_Tour'}), 'consequents': frozenset({'Insurance'}), 'support': 0.5},
+    # Ensure there's a comprehensive option, which generate_packages should handle
+    {'antecedents': frozenset({'Flight', 'Hotel'}), 'consequents': frozenset({'Local_Tour', 'Car_Rental'}), 'support': 0.4},
+])
 
-app = Flask(__name__)
 
-# --- DUMMY DATA ---
-# Since we don't have the actual rules data here, 
-# we create a placeholder list of rules (similar to the image you shared).
-# In a real application, you would load this from a file or a database.
-DUMMY_RULES_DATA = [
-    {'antecedents': {'Flight'}, 'consequents': {'Hotel'}},
-    {'antecedents': {'Hotel'}, 'consequents': {'Local_Tour'}},
-    {'antecedents': {'Car_Rental'}, 'consequents': {'Insurance'}},
-    # This is a rule that links two items together, which is good for a package
-    {'antecedents': {'Flight'}, 'consequents': {'Car_Rental'}}, 
-    # Rules with User_ID are usually discarded for package suggestions
-    {'antecedents': {'Flight'}, 'consequents': {'User_ID'}}, 
-]
-# We will convert this into a list that mimics the structure pandas iterrows() uses.
-# If you are using pandas in apriori_model.py, ensure you pass the DataFrame directly.
-
-# --- ROUTE TO DISPLAY ATTRACTIVE PACKAGES ---
-@app.route('/')
-@app.route('/packages')
-def show_packages():
+# --- FUNCTION TO GENERATE AND DISPLAY CARDS ---
+def display_travel_packages():
     """
-    Handles the /packages route. Calls the backend model to get suggested bundles,
-    and renders the attractive HTML template to display them to the customer.
+    Calls the backend model and uses Streamlit components to display the packages
+    in the attractive card format.
     """
-    
+    st.title("✨ Explore All Travel Packages")
+
     try:
-        # Step 1: Call the function in your apriori_model.py to process the rules.
-        # NOTE: You need to replace DUMMY_RULES_DATA with the function call that 
-        # fetches the LATEST raw rules from your Apriori calculation!
-        
-        # Example if your model uses Pandas (recommended for Apriori output):
-        # import pandas as pd
-        # rules_df = pd.read_csv('data/apriori_rules.csv') 
-        # suggested_packages = generate_packages(rules_df)
-        
-        # Using the dummy data for this example
+        # Get the cleaned list of suggested packages from your model
+        # NOTE: Pass your actual rules data here instead of DUMMY_RULES_DATA 
         suggested_packages = generate_packages(DUMMY_RULES_DATA)
-        
     except Exception as e:
-        print(f"Error generating packages: {e}")
-        # Fallback in case the model or data file fails
+        st.error(f"Error loading package suggestions from model: {e}")
+        # Use a fallback list if the model fails
         suggested_packages = [
             {'title': 'Essential Package (Fallback)', 
              'items': ['Flight', 'Hotel'], 
-             'description': 'A basic, reliable package. Model failed to load.', 
+             'description': 'Basic package available.', 
              'estimated_price_inr': 80000}
         ]
+
+    # --- CSS for Attractive Card Layout (Embedded in Streamlit) ---
+    # This CSS recreates the look we designed for your package.html
+    st.markdown("""
+        <style>
+        .package-card {
+            background: #ffffff;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 15px; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border-top: 5px solid transparent; 
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%; /* Ensures cards align nicely in columns */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .package-card:hover {
+            transform: translateY(-5px); 
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border-top-color: #2ecc71; /* Green accent on hover */
+        }
+        .package-card h3 {
+            color: #34495e;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        .icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            /* Gradient effect using transparent text fill */
+            background: linear-gradient(45deg, #3498db, #2ecc71);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: block; 
+        }
+        .price-display {
+            font-size: 1.8em;
+            color: #e74c3c;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        .book-button {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #2ecc71; 
+            color: white !important; /* Force white text */
+            text-decoration: none;
+            border-radius: 50px; 
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            width: 100%; /* Full width button */
+        }
+        </style>
+    """, unsafe_allow_html=True)
     
-    # Step 2: Render the HTML template, passing the clean package data.
-    # We assume 'package.html' is set up to loop through the 'packages' list.
-    return render_template('package.html', packages=suggested_packages)
+    # Define a simple icon map for display
+    icon_map = {
+        'Flight': '✈️', 'Hotel': '🏨', 'Local_Tour': '🚌', 
+        'Car_Rental': '🚗', 'Insurance': '🛡️', 'Bundle': '🌍'
+    }
+
+    # Streamlit automatically handles responsive columns
+    cols = st.columns(3) # Display 3 packages per row
+
+    for i, package in enumerate(suggested_packages):
+        col = cols[i % 3] # Cycle through the three columns
+
+        # Determine the primary icon
+        if 'Flight' in package['items'] and 'Hotel' in package['items']:
+            package_icon = icon_map['Bundle']
+        else:
+            # Use the first item's icon, or the bundle icon if complex
+            first_item = list(package['items'])[0] if package['items'] else 'Bundle'
+            package_icon = icon_map.get(first_item, '❓')
+
+        # Use st.markdown to inject the custom HTML for the card
+        with col:
+            st.markdown(f"""
+                <div class="package-card">
+                    <div>
+                        <div class="icon">{package_icon}</div>
+                        <h3>{package['title']}</h3>
+                        <p>{package['description']}</p>
+                        <p>Items: {', '.join(item.replace('_', ' ') for item in package['items'])}</p>
+                    </div>
+                    <div>
+                        <div class="price-display">
+                            ₹ {package['estimated_price_inr']:,}
+                        </div>
+                        <a href="#" class="book-button">Book Now</a>
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
 
 
-# --- ROUTE TO RENDER THE OLD/TECHNICAL ASSOCIATION RULES PAGE (FOR DEBUG/ADMIN ONLY) ---
-@app.route('/rules_admin')
-def show_rules_admin():
-    """
-    Renders the raw Association Rule table for an admin/debug view.
-    Customers will NOT see this page.
-    """
-    # Assuming your Apriori model returns the rules directly.
-    # In a real app, you would load the full rules DataFrame here.
-    return render_template('association_rules_table.html', rules=DUMMY_RULES_DATA)
-
-
-if __name__ == '__main__':
-    # Flask will look for templates in a 'templates' folder by default
-    app.run(debug=True)
+# --- MAIN EXECUTION ---
+if __name__ == "__main__":
+    display_travel_packages()
+    
+# NOTE: The if __name__ == '__main__': app.run(debug=True) has been completely REMOVED.
